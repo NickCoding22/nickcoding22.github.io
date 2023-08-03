@@ -1,0 +1,156 @@
+body {
+    font-family: Raleway, Arial, Helvetica, sans-serif;
+    /*min-width: 1080px;*/
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+header {
+    background-color: black;
+    color: white;
+    display: flex;
+    justify-content: space-around;
+    align-content:flex-start;
+    /*flex-wrap: wrap;*/
+    padding: 50px 10.25%;
+}
+
+h1 {
+    font-size: 48px;
+    margin-right: auto;
+    padding: 6px 10px;
+    border: 6px double white;
+}
+
+.nav-bar {
+    margin: auto 0;
+    margin-left: 20px;
+}
+
+header ul {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 12px;
+}
+
+header li {
+    font-size: 24px;
+}
+
+header li:hover {
+    color: lightgray;
+    text-decoration: underline;
+}
+
+.profile {
+    background-color: black;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 50px 10.25%;/*150px;*/
+    padding-top: 25px;
+}
+
+.profile-row-1 {
+    margin-bottom: 50px;
+    display: flex;
+    justify-content: flex-start;
+    align-content: center;
+    /*flex-wrap: wrap;*/
+}
+
+.profile-intro {
+    font-size: 24px;
+    font-weight: 400;
+    width: 50%;
+    /*width: 600px;*/
+    margin-right: auto;
+    margin-bottom: 25px;
+}
+
+.profile-img {
+    object-fit: contain;
+}
+
+.img-holder {
+    width: 45%;
+    /*width: 450px;
+    height: 200px;*/
+    border: 2px solid white;
+    background: url("../Graphics/field_view.jpeg");
+    background-size: cover;
+    background-position: center;
+    /*background-size: 120%;
+    background-position-x: -100px;
+    background-position-y: -270px;
+    background-repeat: no-repeat;*/
+}
+
+.profile-row-2 {
+    flex: 1;
+    display: flex;
+    justify-content:space-between;
+    font-size: 18px;
+}
+
+dt {
+    font-weight: bold;
+}
+
+.portfolio {
+    background-color: white;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    padding: 25px 10.5%;
+}
+
+.portfolio h2 {
+    font-size: 48px;
+    margin: 25px 0;
+}
+
+.project, .club {
+    background-color: white;
+    color: black;
+    display: flex;
+    justify-content: space-evenly;
+    gap: 15px;
+    border: 2px solid black;
+    border-radius: 4px;
+    padding: 9px 15px;
+    margin: 20px 0;
+    transition: all 0.25s;
+}
+
+.project:hover, .club:hover {
+    transform: scale(1.1);
+    box-shadow: 10px 10px 5px lightgray;
+}
+
+.project-photo, .club-photo {
+    height: 80px;
+    width: 80px;
+    border: 2px solid black;
+    border-radius: 50%;
+}
+
+.project h3, .club h3 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.project p, .club p {
+    font-size: 18px;
+}
+
+footer {
+    color: white;
+    background-color: black;
+    padding: 0 10px;
+    padding: 10px 0;
+    text-align: center;
+}
