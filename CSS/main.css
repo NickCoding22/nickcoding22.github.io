@@ -1,5 +1,6 @@
 body {
     font-family: Raleway, Arial, Helvetica, sans-serif;
+    background-color: black;
     /*min-width: 1080px;*/
 }
 
@@ -12,37 +13,47 @@ header {
     background-color: black;
     color: white;
     display: flex;
-    justify-content: space-around;
-    align-content:flex-start;
-    /*flex-wrap: wrap;*/
-    padding: 50px 10.25%;
+    /*justify-content: flex-start;*/
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 45px 7.5%;/*10.25%;*/
+    padding-bottom: 30px;
 }
 
 h1 {
     font-size: 48px;
-    margin-right: auto;
+    /*margin-right: auto;
+    margin-left: auto;*/
+    margin-bottom: 15px;
     padding: 6px 10px;
     border: 6px double white;
 }
 
 .nav-bar {
     margin: auto 0;
-    margin-left: 20px;
+    margin-left: auto;
+    /*margin-left: 20px;*/
 }
 
 header ul {
     display: flex;
     justify-content: space-evenly;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
 header li {
     font-size: 24px;
+    transition: all 0.25s;
+}
+
+header li a:hover {
+    color: lightgray;
 }
 
 header li:hover {
-    color: lightgray;
-    text-decoration: underline;
+    transform: scale(1.1);
 }
 
 .profile {
@@ -50,8 +61,9 @@ header li:hover {
     color: white;
     display: flex;
     flex-direction: column;
-    padding: 50px 10.25%;/*150px;*/
+    padding: 50px 7.5%;/*10.25%;*/
     padding-top: 25px;
+    padding-bottom: 45px;
 }
 
 .profile-row-1 {
@@ -59,15 +71,19 @@ header li:hover {
     display: flex;
     justify-content: flex-start;
     align-content: center;
-    /*flex-wrap: wrap;*/
+    flex-wrap: wrap;
 }
 
 .profile-intro {
     font-size: 24px;
     font-weight: 400;
-    width: 50%;
+    /*width: 50%;*/
     /*width: 600px;*/
-    margin-right: auto;
+    width: 572.5px;
+    min-width: 300px;
+    margin-right: 5%;
+    flex: 1;
+    /*margin-right: auto;*/
     margin-bottom: 25px;
 }
 
@@ -76,7 +92,10 @@ header li:hover {
 }
 
 .img-holder {
-    width: 45%;
+    /*width: 45%;*/
+    flex: 1;
+    min-height: 190px;
+    min-width: 200px;
     /*width: 450px;
     height: 200px;*/
     border: 2px solid white;
@@ -92,12 +111,20 @@ header li:hover {
 .profile-row-2 {
     flex: 1;
     display: flex;
+    flex-wrap: wrap;
     justify-content:space-between;
     font-size: 18px;
 }
 
+.profile-row-2 div {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
+}
+
 dt {
     font-weight: bold;
+    margin-right: 10px;
 }
 
 .portfolio {
@@ -105,7 +132,7 @@ dt {
     color: black;
     display: flex;
     flex-direction: column;
-    padding: 25px 10.5%;
+    padding: 25px 7.5%;/*10.25%;*/
 }
 
 .portfolio h2 {

@@ -1,5 +1,5 @@
 const headerTitle = document.querySelector(".title")
-const title = "Nicholas Angelici"
+const title = "Nick Angelici"
 let currentPosition = 1;
 let timerID = "";
 let animationID = "";
