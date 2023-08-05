@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel = "stylesheet" type = "text/css" href = "../CSS/reset.css">
     <link rel = "stylesheet" type = "text/css" href = "../CSS/main.css">
-    <link rel = "stylesheet" type = "text/css" href = "../CSS/minesweeper.css">
-    <link rel = "stylesheet" href = "http://fonts.googleapis.com/css?family=Raleway:300,700">
+    <link rel = "stylesheet" type = "text/css" href = "../CSS/snake.css">
+    <link rel = "stylesheet" href = "https://fonts.googleapis.com/css?family=Raleway:300,700">
     <script src = "../Javascript/header.js" defer></script>
-    <script src = "../Javascript/minesweeper.js" defer></script>
+    <script src = "../Javascript/newsnake.js" defer></script>
     <title>Minesweeper</title>
 </head>
 <body>
@@ -29,14 +29,37 @@
             <h3>Snake</h3>
         </div></a>
         <a href = "../Games/minesweeper.html"><div class = "game-option" id = "msweeper">
-            <h3>MineSweeper</h3>
+            <h3>Minesweeper</h3>
         </div></a>
         <a href = "../Games/2048.html"><div class = "game-option">
             <h3>2048</h3>
         </div></a>
     </nav>
-    <div>
-        
+    <div class = "total-container">
+        <div class = "row-1">
+            <div class = "dashboard">
+                <div class = "score-window">Score: 0</div>
+                <label class = "board-size"> Difficulty: 
+                    <select class = "board-change">
+                        <option class = "s-option" value = "11">Easy</option>
+                        <option class = "s-option" value = "21" selected>Normal</option>
+                        <option class = "s-option" value = "31">Hard</option>
+                    </select>
+                </label>
+                <label class = "snake-speed"> Speed: 
+                    <select class = "speed-change">
+                        <option class = "s-option" value = "250">Easy</option>
+                        <option class = "s-option" value = "125" selected>Normal</option>
+                        <option class = "s-option" value = "75">Hard</option>
+                    </select>
+                </label>
+            </div>
+            <button id = "play-button">Play Again</button>
+        </div>
+        <div class = "row-2">
+            <div class = "game-container"></div>
+            <div class = "colors">Colors:</div>
+        </div>
     </div>
     <footer>
         Created by Nicholas Angelici in HTML CSS and Javascript
