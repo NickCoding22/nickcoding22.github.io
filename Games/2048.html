@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel = "stylesheet" type = "text/css" href = "../CSS/reset.css">
     <link rel = "stylesheet" type = "text/css" href = "../CSS/main.css">
-    <link rel = "stylesheet" type = "text/css" href = "../CSS/minesweeper.css">
+    <link rel = "stylesheet" type = "text/css" href = "../CSS/2048.css">
     <link rel = "stylesheet" href = "https://fonts.googleapis.com/css?family=Raleway:300,700">
     <script src = "../Javascript/header.js" defer></script>
-    <script src = "../Javascript/minesweeper.js" defer></script>
-    <title>Minesweeper</title>
+    <script src = "../Javascript/2048.js" defer></script>
+    <title>2048</title>
 </head>
 <body>
     <header>
@@ -35,8 +35,20 @@
             <h3>2048</h3>
         </div></a>
     </nav>
-    <div>
-        
+    <div class = "overflow-container">
+        <div class = "dashboard">
+            <div class = "score">Score: 0</div>
+            <div class = "moves-made">Moves Made: 0</div>
+            <button class = "reset">Restart</button>
+        </div>
+        <div class = "game-container">
+            <div class = "grid">
+            </div>
+            <div class = "tile-container">
+            </div>
+            <div class = "win-message">Congratulations!<br>Click to continue</div>
+            <div class = "lose-message">Game Over!<br>Click "Restart" to play again</div>
+        </div>
     </div>
     <footer>
         Created by Nicholas Angelici in HTML CSS and Javascript

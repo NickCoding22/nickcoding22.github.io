@@ -152,7 +152,6 @@ function determineAndPlaceBombs(safeSpots) {
             const row = Math.trunc(newSpot / difficulty.width);
             const column = Math.trunc(newSpot % difficulty.width);
             const newID = `#_${row}_${column}`;
-            /*if (newID != safeSpot) {*/
             if (!safeSpots.includes(newID)) {
                 const bombBlock = document.querySelector(newID);
                 bombBlock.classList.add("bomb");

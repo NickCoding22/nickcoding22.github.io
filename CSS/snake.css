@@ -1,7 +1,8 @@
+/* MAIN CONTAINERS */
 .total-container {
     display: flex;
     flex-direction: column;
-    overflow-x:auto;
+    overflow-x: auto;
 }
 
 .row-1, .row-2 {
@@ -17,12 +18,12 @@
     margin: 10px auto;
     margin-bottom: 50px;
 }
+/* ********** */
 
+/* DASHBOARD */
 .dashboard {
     background-color: black;
     border: 8px outset white;
-    /*margin: 50px auto;
-    margin-bottom: 10px;*/
     width: 540px;
     height: 50px;
     display: flex;
@@ -32,16 +33,15 @@
 
 .score-window, .board-size, .snake-speed {
     font-size: 24px;
-    /*height: 36px;*/
+    font-weight: bold;
     color: white
-    /*background-color: white;
-    border: 2px outset black;*/
  }
 
  .board-change, .speed-change {
     font-size: 24px;
     background-color: white;
     color: black;
+    border: 2px outset black;
  }
 
  #play-button {
@@ -59,18 +59,15 @@
     color: black;
     border-color: black;
  }
+/* ********** */
 
+/* GAME CONTAINER */
 .game-container {
-    /*margin: 50px auto;
-    margin-top: 10px;*/
     width: 540px;
     height: 540px;
     border: 8px outset white;
-    /*border-radius: 4px;*/
     display: flex;
     flex-wrap: wrap;
-    /*justify-content: center;
-    align-items: center;*/
 }
 
 .empty-space {
@@ -82,21 +79,22 @@
     background-color: white;
     width: 30px;
     height: 30px;
-    /*position: relative;
-    transition: background-color 0.1s;*/
     transition-timing-function: linear
 }
 
 .apple {
     background-color: red;
 }
+/* ********** */
 
+/* COLOR MENU */
 .colors {
     width: 134px;
     height: 520px;
     border: 8px outset white;
     color: white;
     font-size: 24px;
+    font-weight: bold;
     text-align: center;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -111,3 +109,4 @@
     width: 80px; 
     height: 40px;
 }
+/* ********** */
