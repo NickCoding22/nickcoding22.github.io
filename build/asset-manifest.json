@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/nickcoding22.github.io/static/css/main.31d12664.css",
+    "main.js": "/nickcoding22.github.io/static/js/main.aa28b101.js",
+    "static/js/453.253ccfac.chunk.js": "/nickcoding22.github.io/static/js/453.253ccfac.chunk.js",
+    "static/media/html_logo.png": "/nickcoding22.github.io/static/media/html_logo.7ba36e77d762a0cd0c67.png",
+    "static/media/execify.png": "/nickcoding22.github.io/static/media/execify.19a41592c7d54743a0fa.png",
+    "static/media/ai61A.png": "/nickcoding22.github.io/static/media/ai61A.4b73a72b6039b74f8d20.png",
+    "static/media/dart_logo.jpeg": "/nickcoding22.github.io/static/media/dart_logo.b97007eb4fdb3122205b.jpeg",
+    "static/media/bmun_icon.jpeg": "/nickcoding22.github.io/static/media/bmun_icon.76234e5193df61d1fd89.jpeg",
+    "static/media/Twitter_Icon.png": "/nickcoding22.github.io/static/media/Twitter_Icon.f56ddd48e7a53f3f82bb.png",
+    "index.html": "/nickcoding22.github.io/index.html",
+    "main.31d12664.css.map": "/nickcoding22.github.io/static/css/main.31d12664.css.map",
+    "main.aa28b101.js.map": "/nickcoding22.github.io/static/js/main.aa28b101.js.map",
+    "453.253ccfac.chunk.js.map": "/nickcoding22.github.io/static/js/453.253ccfac.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.31d12664.css",
+    "static/js/main.aa28b101.js"
+  ]
+}
