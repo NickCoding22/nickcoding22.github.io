@@ -1,0 +1,104 @@
+body {
+    background-color: black;
+    font-family: Raleway, Arial, Helvetica, sans-serif;
+}
+
+.overflow-container {
+    overflow-x: auto;
+}
+
+/*DASHBOARD*/
+.dash-board {
+    width: 960px;
+    height: 50px;
+    border: 4px solid black;
+    border-top: none;
+    border-bottom: 2px solid black;
+    background-color: white;
+    color: black;
+    padding: 2px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.reset-btn, .diff-change, .instructions {
+    font-size: 24px;
+    height: 36px;
+    background-color: rgb(163 163 163);
+    padding-left: 4px;
+    padding-right: 4px;
+    border-radius: 0.375rem;
+    color: white;
+}
+
+.reset-btn:hover, .diff-change:hover, .instructions:hover, .instructions-text {
+    background-color: black;
+    border-style: inset;
+}
+
+.instructions-text {
+    font-size: 24px;
+    position: absolute;
+    margin-top: 5px;
+    margin-left: -9px;
+    z-index: 10px;
+    text-align: left;
+}
+
+.instructions-text p {
+    margin: 0;
+    padding: 7.5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.hidden {
+    display: none;
+}
+
+.flag-tracker, .diff-label {
+    font-size: 24px;
+    color: black;
+}
+/* ********** */
+
+/*GAME CONTAINER AND OBJECTS*/
+.game-container-mine {
+    background-color:white;
+    height: 512px;
+    width: 960px;
+    border: 2px solid black;
+    border-top:none;
+    display: flex;
+    justify-content:center;
+    flex-wrap: wrap;
+    font-size: 64px;
+    line-height: 512px;
+    color: white;
+}
+
+.block {
+    background-color: white;
+    border: 2px solid black;
+    text-align: center;
+    font-size: 24px;
+    user-select: none;
+}
+
+.bomb {
+    background-color: white;
+}
+
+.selected {
+    background-color: black;
+    color: white;
+    border-style: inset;
+}
+
+.flagged {
+    background-color: green;
+}
+/* ********** */
