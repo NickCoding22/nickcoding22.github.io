@@ -4,6 +4,8 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { initGA, logPageView } from './analytics';
+import { useEffect } from 'react';
+import { BrowserRouter as useLocation } from 'react-router-dom';
 
 const RouteChangeTracker = () => {
   const location = useLocation();
@@ -18,7 +20,7 @@ const RouteChangeTracker = () => {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <RouteChangeTracker />
+    <RouteChangeTracker />g
     <App />
   </React.StrictMode>
 );
