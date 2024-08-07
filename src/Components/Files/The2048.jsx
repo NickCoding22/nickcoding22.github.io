@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import ControlBar from '../Utils/ControlBar.jsx';
 import Draggable from 'react-draggable';
 
-function The2048({display, setDisplay}) {
+function The2048({display, setDisplay, z, changeOrder}) {
   const gameContainerRef = useRef(null);
   const gameInitializedRef = useRef(false);
   const [removals, setRemovals] = useState([]);
@@ -40,7 +40,7 @@ function The2048({display, setDisplay}) {
   const offSetY = 75;
     
   return (
-    <div class={`main-display ${display ? 'flex' : 'hidden'}`}>
+    <div class={`main-display ${display ? 'flex' : 'hidden'} ${z}`} onMouseDown={() => changeOrder()}>
       <Draggable
         handle=".handle"
         defaultPosition={{x: offSetX, y: offSetY}}

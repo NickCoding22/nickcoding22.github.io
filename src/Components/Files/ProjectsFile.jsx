@@ -5,7 +5,7 @@ import twitterIcon from '../../Graphics/Twitter_Icon.png';
 import dartIcon from '../../Graphics/dart_logo.jpeg';
 import htmlIcon from '../../Graphics/html_logo.png';
 
-function ProjectsFile({mobile, display, setDisplay}) {
+function ProjectsFile({mobile, display, setDisplay, z, changeOrder}) {
     const offSetX = mobile ? window.innerWidth * (.5 / 12) : window.innerWidth / 2 + 60;
     const offSetY = mobile ? 910 : 20;
     const width = mobile ? 'w-11/12' : 'w-4/12';
@@ -13,7 +13,7 @@ function ProjectsFile({mobile, display, setDisplay}) {
 
     return (
         display ?
-        <div>
+        <div class={z} onMouseDown={() => changeOrder()}>
             <Draggable
                 handle=".handle"
                 defaultPosition={{x: offSetX, y: offSetY}}

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import ControlBar from '../Utils/ControlBar.jsx';
 import Draggable from 'react-draggable';
 
-function MineSweeper({display, setDisplay}) {
+function MineSweeper({display, setDisplay, z, changeOrder}) {
     const gameContainerRef = useRef(null);
     const gameInitializedRef = useRef(false);
 
@@ -28,7 +28,7 @@ function MineSweeper({display, setDisplay}) {
     const offSetY = 50;
         
     return (
-        <div class={`main-display ${display ? 'flex' : 'hidden'}`}>
+        <div class={`main-display ${display ? 'flex' : 'hidden'} ${z}`} onMouseDown={() => changeOrder()}>
         <Draggable
             handle=".handle"
             defaultPosition={{x: offSetX, y: offSetY}}

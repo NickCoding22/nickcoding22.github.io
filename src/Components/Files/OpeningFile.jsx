@@ -1,8 +1,8 @@
 import Draggable from 'react-draggable';
 import ControlBar from '../Utils/ControlBar.jsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-function OpeningFile({mobile, display, setDisplay}) {
+function OpeningFile({mobile, display, setDisplay, z, changeOrder}) {
     const offSetX = mobile ? window.innerWidth * (.5 / 12) : 40;
     const offSetY = mobile ? 10 : 20;
     //const width = window.innerWidth * 11 / 12;
@@ -12,7 +12,7 @@ function OpeningFile({mobile, display, setDisplay}) {
 
     return (
         display ?
-        <div>
+        <div class={z} onMouseDown={() => changeOrder()}>
             <Draggable
                 handle=".handle"
                 defaultPosition={{x: offSetX, y: offSetY}}
