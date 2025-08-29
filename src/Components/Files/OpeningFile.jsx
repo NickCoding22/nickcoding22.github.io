@@ -1,6 +1,7 @@
 import Draggable from 'react-draggable';
 import ControlBar from '../Utils/ControlBar.jsx';
-import { useState, useEffect } from 'react';
+import itsMe from '../../Graphics/linkedin.png';
+import { useState } from 'react';
 
 function OpeningFile({mobile, display, setDisplay, z, changeOrder}) {
     const offSetX = mobile ? window.innerWidth * (.5 / 12) : 40;
@@ -21,22 +22,25 @@ function OpeningFile({mobile, display, setDisplay, z, changeOrder}) {
                 <div className={mainStyle}>
                     <ControlBar name="Opening" setDisplay={setDisplay}/>
                     <div className={`flex flex-col rounded-bl-md rounded-br-md overflow-auto h-[548px] ${mobile ? 'py-6 px-4' : 'px-10 pt-6 pb-7'} bg-white border-x-4 border-b-4 border-black text-black text-left`}>
-                        <h1 className={`font-semibold ${mobile ? 'text-6xl' : 'text-8xl'}`}>
-                            Nicholas Angelici
-                        </h1>
+                        <div className="flex flex-row justify-between">
+                            <h1 className={`font-semibold ${mobile ? 'text-6xl' : 'text-8xl'}`}>
+                                Nicholas Angelici
+                            </h1>
+                            <img src={itsMe} class="max-w-[192px] h-full aspect-square rounded-full text-wrap" />
+                        </div>
                         <br />
                         <p className="text-black text-lg">
-                            Hello! I'm Nicholas Angelici, a student at UC Berkeley double majoring 
+                            Hello! I'm Nicholas Angelici, a senior at the <b>University of California, Berkeley</b> double majoring 
                             in <b>Computer Science</b> and <b>Data Science</b>. 
                             When I'm not working on projects, 
-                            I like to spend my time reading, playing golf,
-                            going to the gym, and improving my rankings in Nintendo Switch Sports. 
+                            I like to spend my time reading, playing golf or pickleball,
+                            going to the gym, and logging movies on Letterboxd. 
                         </p>
                         <br />
                         <p className="text-black text-lg">
                             This is an interactive website inspired by early mac desktops. Meaning, you 
-                            can drag, open, close, and interact with the files! You can contact me at 
-                            <br/><b className="font-extrabold italic">nickangelici@berkeley.edu</b>. Go Bears!
+                            can drag, open, close, and interact with the files! The games are playable, give them a try!
+                            You can contact me at <b className="font-extrabold italic">nickangelici@berkeley.edu</b>. Go Bears!
                         </p>
                     </div>
                 </div>

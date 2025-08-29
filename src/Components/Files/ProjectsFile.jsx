@@ -6,8 +6,8 @@ import dartIcon from '../../Graphics/dart_logo.jpeg';
 import htmlIcon from '../../Graphics/html_logo.png';
 
 function ProjectsFile({mobile, display, setDisplay, z, changeOrder}) {
-    const offSetX = mobile ? window.innerWidth * (.5 / 12) : window.innerWidth / 2 + 60;
-    const offSetY = mobile ? 910 : 20;
+    const offSetX = mobile ? window.innerWidth * (.5 / 12) : (window.innerWidth / 2 + 60) - 10;
+    const offSetY = mobile ? 910 : 10;
     const width = mobile ? 'w-11/12' : 'w-4/12';
     const mainStyle = `absolute overflow-auto rounded-sm pb-4 ${width}`;
 
@@ -21,7 +21,7 @@ function ProjectsFile({mobile, display, setDisplay, z, changeOrder}) {
             >
                 <div className={mainStyle}>
                     <ControlBar name="Projects" setDisplay={setDisplay}/>
-                    <div className="flex flex-col gap-4 max-h-[250px] border-x-4 border-b-4 border-black overflow-auto bg-white rounded-bl-md rounded-br-md p-5">
+                    <div className="flex flex-col gap-4 h-[548px] border-x-4 border-b-4 border-black overflow-auto bg-white rounded-bl-md rounded-br-md p-5">
                         <h2 class="font-bold text-3xl">Projects:</h2>
                         <div>
                             <h3 class="italic font-semibold">Article Sentiment Comprehension (ASC)</h3>

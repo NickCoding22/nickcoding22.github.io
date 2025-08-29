@@ -7,11 +7,12 @@ function PageManager() {
     const [openingDisplay, setOpeningDisplay] =  useState(true);
     const [projectsDisplay, setProjectsDisplay] = useState(true);
     const [experienceDisplay, setExperienceDisplay] = useState(true);
+    const [academicDisplay, setAcademicDisplay] = useState(true);
     const [snakeDisplay, setSnakeDisplay] = useState(false);
     const [mineSweeperDisplay, setMineSweeperDisplay] = useState(false);
     const [the2048Display, setthe2048Display] = useState(false);
-    const displays = [openingDisplay, projectsDisplay, snakeDisplay, mineSweeperDisplay, the2048Display, experienceDisplay];
-    const setDisplays = [setOpeningDisplay, setProjectsDisplay, setSnakeDisplay, setMineSweeperDisplay, setthe2048Display, setExperienceDisplay];
+    const displays = [openingDisplay, projectsDisplay, snakeDisplay, mineSweeperDisplay, the2048Display, experienceDisplay, academicDisplay];
+    const setDisplays = [setOpeningDisplay, setProjectsDisplay, setSnakeDisplay, setMineSweeperDisplay, setthe2048Display, setExperienceDisplay, setAcademicDisplay];
 
     const [frameWidth, setFrameWidth] = useState(window.innerWidth);
     const colorList = ["bg-neutral-500", "bg-orange-500", "bg-red-500", "bg-blue-500", "bg-green-500", "bg-purple-500"];
