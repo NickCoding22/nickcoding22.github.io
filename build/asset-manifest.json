@@ -1,9 +1,13 @@
 {
   "files": {
-    "main.css": "/static/css/main.d0ed78d4.css",
-    "main.js": "/static/js/main.324e324d.js",
+    "main.css": "/static/css/main.b0a6cf55.css",
+    "main.js": "/static/js/main.962ddc97.js",
     "static/js/453.253ccfac.chunk.js": "/static/js/453.253ccfac.chunk.js",
     "static/media/linkedin.png": "/static/media/linkedin.ac22e83ea50991df6403.png",
+    "static/media/selfie2.jpg": "/static/media/selfie2.16f77d4853b485c7334f.jpg",
+    "static/media/farBuilding.jpg": "/static/media/farBuilding.64e0a70996f4e4a7e941.jpg",
+    "static/media/selfie1.jpg": "/static/media/selfie1.9736511f9df1ad32684d.jpg",
+    "static/media/closeBuilding.jpg": "/static/media/closeBuilding.6fed2f783ef3c1abdc9f.jpg",
     "static/media/html_logo.png": "/static/media/html_logo.7ba36e77d762a0cd0c67.png",
     "static/media/execify.png": "/static/media/execify.19a41592c7d54743a0fa.png",
     "static/media/ai61A.png": "/static/media/ai61A.4b73a72b6039b74f8d20.png",
@@ -11,12 +15,12 @@
     "static/media/bmun_icon.jpeg": "/static/media/bmun_icon.76234e5193df61d1fd89.jpeg",
     "static/media/Twitter_Icon.png": "/static/media/Twitter_Icon.f56ddd48e7a53f3f82bb.png",
     "index.html": "/index.html",
-    "main.d0ed78d4.css.map": "/static/css/main.d0ed78d4.css.map",
-    "main.324e324d.js.map": "/static/js/main.324e324d.js.map",
+    "main.b0a6cf55.css.map": "/static/css/main.b0a6cf55.css.map",
+    "main.962ddc97.js.map": "/static/js/main.962ddc97.js.map",
     "453.253ccfac.chunk.js.map": "/static/js/453.253ccfac.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d0ed78d4.css",
-    "static/js/main.324e324d.js"
+    "static/css/main.b0a6cf55.css",
+    "static/js/main.962ddc97.js"
   ]
 }

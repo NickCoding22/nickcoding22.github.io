@@ -2,10 +2,10 @@ import NavIcon from '../Icons/NavIcon.jsx';
 import TimeBox from './TimeBox.jsx';
 import { IconSettings } from '@tabler/icons-react';
 import { faLinkedin, faGithub } from '@fortawesome/free-brands-svg-icons';
-import { faAddressBook } from '@fortawesome/free-regular-svg-icons'
+import { faAddressBook, faSmile } from '@fortawesome/free-regular-svg-icons'
 import { useEffect, useState } from 'react';
 
-function NavBar({setColor, colorList}) {
+function NavBar({setColor, colorList, projNum}) {
     const [frameWidth, setFrameWidth] = useState(window.innerWidth);
     const [pickColor, setPickColor] = useState(false);
     useEffect(() => {
@@ -30,6 +30,26 @@ function NavBar({setColor, colorList}) {
                         </div>;
     const navOrientation = frameWidth < 755 ? 'justify-center' : 'justify-between';
     const timeBox = frameWidth < 755 ? null : <TimeBox />;
+
+    console.log(projNum);
+
+    if (projNum >= 0) {
+        return (
+            <div class="flex flex-col items-start">
+                <div class={`flex flex-row ${navOrientation} flex-wrap items-center bg-white border-b-2 border-black w-full p-2`}>
+                    <div class={`flex flex-row flex-wrap justify-center items-center ${frameWidth < 755 ? '' : 'pl-5'}`}>
+                        {settingsArea}
+                        <div class={`flex flex-row flex-wrap justify-center gap-4 ${frameWidth < 755 ? '' : 'pl-5'}`}>
+                            {[...Array(projNum+1)].map((_, i) => (
+                                <NavIcon icon={faSmile} name={`Project ${i}`} />
+                            ))}
+                        </div>
+                    </div>
+                    {timeBox}
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div class="flex flex-col items-start">

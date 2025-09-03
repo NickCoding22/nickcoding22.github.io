@@ -2,12 +2,19 @@ import './App.css';
 import PageManager from './Components/PageManager.jsx';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
+import { Routes, Route } from "react-router-dom";
+import CS180 from './pages/CS180.jsx';
 
 library.add(fas);
 
 function App() {
   return (
-    <PageManager />
+    <div>
+      <Routes>
+        <Route path="/" element={<PageManager />} />
+        <Route path="/cs180" element={<CS180 />} />
+      </Routes>
+    </div>
   );
 }
 
