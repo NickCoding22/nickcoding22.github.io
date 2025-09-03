@@ -22,11 +22,11 @@ function OpeningFile({mobile, display, setDisplay, z, changeOrder}) {
                 <div className={mainStyle}>
                     <ControlBar name="Opening" setDisplay={setDisplay}/>
                     <div className={`flex flex-col rounded-bl-md rounded-br-md overflow-auto h-[548px] ${mobile ? 'py-6 px-4' : 'px-10 pt-6 pb-7'} bg-white border-x-4 border-b-4 border-black text-black text-left`}>
-                        <div className="flex flex-row justify-between">
+                        <div className="flex flex-row gap-4 items-center">
                             <h1 className={`font-semibold ${mobile ? 'text-6xl' : 'text-8xl'}`}>
                                 Nicholas Angelici
                             </h1>
-                            <img src={itsMe} class="max-w-[192px] h-full aspect-square rounded-full text-wrap" />
+                            <img src={itsMe} class="max-h-40 max-w-40 aspect-square rounded-full text-wrap" />
                         </div>
                         <br />
                         <p className="text-black text-lg">
