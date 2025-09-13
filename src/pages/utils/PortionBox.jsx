@@ -18,7 +18,7 @@ function PortionBox({title, photos}) {
                 <h1 className={`font-semibold text-3xl`}>
                     {title}
                 </h1>
-                <div className={`flex flex-row ${justifyClass}`}>
+                <div className={`flex flex-row gap-2 ${justifyClass}`}>
                     {photos.map((photo, key) => 
                         <img src={photo} key={key} class="max-w-64 max-h-64 object-contain border-4 border-black" />
                     )}

@@ -1,0 +1,12 @@
+@media print {
+  /* Make scrollable containers expand */
+  .scrollable {
+    overflow: visible !important; /* Show all content */
+    height: auto !important;      /* Let container grow */
+  }
+
+  /* Optional: adjust page layout */
+  body {
+    overflow: visible !important;
+  }
+}
