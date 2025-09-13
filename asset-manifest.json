@@ -1,26 +1,45 @@
 {
   "files": {
-    "main.css": "/static/css/main.b0a6cf55.css",
-    "main.js": "/static/js/main.7e7c1029.js",
-    "static/js/453.253ccfac.chunk.js": "/static/js/453.253ccfac.chunk.js",
+    "main.css": "/static/css/main.13f72a21.css",
+    "main.js": "/static/js/main.e0db43fb.js",
+    "static/js/453.0437a03d.chunk.js": "/static/js/453.0437a03d.chunk.js",
     "static/media/linkedin.png": "/static/media/linkedin.ac22e83ea50991df6403.png",
     "static/media/selfie2.jpg": "/static/media/selfie2.16f77d4853b485c7334f.jpg",
     "static/media/farBuilding.jpg": "/static/media/farBuilding.64e0a70996f4e4a7e941.jpg",
     "static/media/selfie1.jpg": "/static/media/selfie1.9736511f9df1ad32684d.jpg",
+    "static/media/final_icon.jpg": "/static/media/final_icon.899a6f17639936446530.jpg",
+    "static/media/final_self_portrait.jpg": "/static/media/final_self_portrait.fa471101ebf8c276117e.jpg",
+    "static/media/final_siren.jpg": "/static/media/final_siren.f6b54c6a8b38cfb8b849.jpg",
+    "static/media/final_harvesters.jpg": "/static/media/final_harvesters.a62e07493c49f6b77da8.jpg",
+    "static/media/final_melons.jpg": "/static/media/final_melons.10442b6356d1f52d8b39.jpg",
+    "static/media/first_try_three_generations.jpg": "/static/media/first_try_three_generations.2a5dd56f0c1c302e926a.jpg",
     "static/media/closeBuilding.jpg": "/static/media/closeBuilding.6fed2f783ef3c1abdc9f.jpg",
+    "static/media/final_emir.jpg": "/static/media/final_emir.258013ec5a9b27229172.jpg",
+    "static/media/final_lugano.jpg": "/static/media/final_lugano.441b51f26e4d928bac9c.jpg",
+    "static/media/final_three_generations.jpg": "/static/media/final_three_generations.68ca1c618a04da0b7188.jpg",
+    "static/media/final_italil.jpg": "/static/media/final_italil.5683c449e02e8c06dfbc.jpg",
+    "static/media/final_lastochikino.jpg": "/static/media/final_lastochikino.efc38d8c828c250f2656.jpg",
+    "static/media/final_church.jpg": "/static/media/final_church.4b9d8a66e37f1e47963f.jpg",
     "static/media/html_logo.png": "/static/media/html_logo.7ba36e77d762a0cd0c67.png",
     "static/media/execify.png": "/static/media/execify.19a41592c7d54743a0fa.png",
+    "static/media/final_alupka.jpg": "/static/media/final_alupka.d5cd73992b68606fabdc.jpg",
     "static/media/ai61A.png": "/static/media/ai61A.4b73a72b6039b74f8d20.png",
+    "static/media/final_tobolsk.jpg": "/static/media/final_tobolsk.8fac29a0817a6c56e6da.jpg",
+    "static/media/final_cathedral.jpg": "/static/media/final_cathedral.563eea140be2700b11cc.jpg",
     "static/media/dart_logo.jpeg": "/static/media/dart_logo.b97007eb4fdb3122205b.jpeg",
+    "static/media/final_dome.jpg": "/static/media/final_dome.82450d17917fac5b9142.jpg",
+    "static/media/final_monastery.jpg": "/static/media/final_monastery.e576bcb792d12eac97df.jpg",
+    "static/media/first_try_cathedral.jpg": "/static/media/first_try_cathedral.11421753646af97754ba.jpg",
+    "static/media/final_napoleon.jpg": "/static/media/final_napoleon.3166df692ac150110858.jpg",
     "static/media/bmun_icon.jpeg": "/static/media/bmun_icon.76234e5193df61d1fd89.jpeg",
     "static/media/Twitter_Icon.png": "/static/media/Twitter_Icon.f56ddd48e7a53f3f82bb.png",
     "index.html": "/index.html",
-    "main.b0a6cf55.css.map": "/static/css/main.b0a6cf55.css.map",
-    "main.7e7c1029.js.map": "/static/js/main.7e7c1029.js.map",
-    "453.253ccfac.chunk.js.map": "/static/js/453.253ccfac.chunk.js.map"
+    "main.13f72a21.css.map": "/static/css/main.13f72a21.css.map",
+    "main.e0db43fb.js.map": "/static/js/main.e0db43fb.js.map",
+    "453.0437a03d.chunk.js.map": "/static/js/453.0437a03d.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.b0a6cf55.css",
-    "static/js/main.7e7c1029.js"
+    "static/css/main.13f72a21.css",
+    "static/js/main.e0db43fb.js"
   ]
 }
