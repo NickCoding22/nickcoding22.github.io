@@ -4,6 +4,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { Routes, Route } from "react-router-dom";
 import CS180 from './pages/CS180.jsx';
+import CS180Proj2 from './pages/CS180Proj2.jsx';
 
 library.add(fas);
 
@@ -13,6 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<PageManager />} />
         <Route path="/cs180" element={<CS180 />} />
+        <Route path="/cs180/proj2" element={<CS180Proj2 />} />
       </Routes>
     </div>
   );
