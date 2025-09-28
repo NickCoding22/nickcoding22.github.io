@@ -14,7 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<PageManager />} />
         <Route path="/cs180" element={<CS180 />} />
-        <Route path="/cs180/proj2" element={<CS180Proj2 />} />
+        <Route path="/cs180proj2" element={<CS180Proj2 />} />
       </Routes>
     </div>
   );
