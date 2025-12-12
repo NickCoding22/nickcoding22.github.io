@@ -803,37 +803,37 @@ function CS180Proj5() {
                 <div className="flex flex-row justify-center">
                     <div className="flex flex-col gap-2 w-96">
                         <img src={pizza} />
-                        Golf Ball
+                        Pizza Box
                     </div>
                 </div>
                 <br/>
                 <div className="flex flex-row justify-between">
                     <div className="flex flex-col gap-2 w-96">
                         <img src={box1} />
-                        Gaming Cat at noise level 1
+                        Sunset at noise level 1
                     </div>
                     <div className="flex flex-col gap-2 w-96">
                         <img src={box2} />
-                        Gaming Cat at noise level 3
+                        Sunset at noise level 3
                     </div>
                     <div className="flex flex-col gap-2 w-96">
                         <img src={box3} />
-                        Gaming Cat at noise level 5
+                        Sunset at noise level 5
                     </div>
                 </div>
                 <br/>
                 <div className="flex flex-row justify-between">
                     <div className="flex flex-col gap-2 w-96">
                         <img src={box4} />
-                        Gaming Cat at noise level 7
+                        Sunset at noise level 7
                     </div>
                     <div className="flex flex-col gap-2 w-96">
                         <img src={box5} />
-                        Gaming Cat at noise level 10
+                        Sunset at noise level 10
                     </div>
                     <div className="flex flex-col gap-2 w-96">
                         <img src={box6} />
-                        Gaming Cat at noise level 20
+                        Sunset at noise level 20
                     </div>
                 </div>
                 <br/>
