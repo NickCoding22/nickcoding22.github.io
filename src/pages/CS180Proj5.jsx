@@ -131,6 +131,29 @@ import anagram2 from './Graphics/proj5/anagram2.png';
 import hybrid1 from './Graphics/proj5/hybrid1.png';
 import hybrid2 from './Graphics/proj5/hybrid2.png';
 
+import noiseProcess from './Graphics/proj5/noiseProg.png';
+
+import epoch1 from './Graphics/proj5/epoch1.png';
+import epoch5 from './Graphics/proj5/epoch5.png';
+import epochCurve from './Graphics/proj5/epochCurve.png';
+
+import oodTest from './Graphics/proj5/oodTest.png';
+
+import denoiseE1 from './Graphics/proj5/denoiseE1.png';
+import denoiseE2 from './Graphics/proj5/denoiseE2.png';
+import denoiseTrain from './Graphics/proj5/denoiseTrain.png';
+
+import improveTrain from './Graphics/proj5/improveTrain.png';
+
+import epoch11 from './Graphics/proj5/epoch11.png';
+import epoch55 from './Graphics/proj5/epoch55.png';
+import epoch1010 from './Graphics/proj5/epoch1010.png';
+
+import ccTrain from './Graphics/proj5/ccTrain.png';
+import cc1 from './Graphics/proj5/cc1.png';
+import cc5 from './Graphics/proj5/cc5.png';
+import cc10 from './Graphics/proj5/cc10.png';
+
 function CS180Proj5() {
     return (
         <div className="text-white flex flex-col items-start m-auto px-20 py-10 font-mono gap-4">
@@ -901,7 +924,181 @@ function CS180Proj5() {
                 <br/>
             </div>
             <h1 className="text-4xl font-bold w-full text-center">Part B: <span className="text-green-500">Flow Matching From Scratch!</span></h1>
-            <h1 className="text-4xl font-bold w-full text-center">ToDo...</h1>
+            <div>
+                <h3 className="text-2xl font-bold">Part 1.1: Implementing the UNet</h3>
+                <p className="text-lg">
+                    The first part of Part B was implementing the denoiser as a UNet. The
+                    implementation was subsequently used for the following parts. 
+                </p>
+                <br/>
+            </div>
+            <div className="w-full">
+                <h3 className="text-2xl font-bold">Part 1.2: Using the UNet to Train a Denoiser</h3>
+                <p className="text-lg">
+                    With the UNet etablished, the next step was to work on adding in some noise. The following 
+                    diagram outlines the different noising processes over the range [0.0, 0.2, 0.4, 0.6, 0.8, 1.0].
+                </p>
+                <br/>
+                <div className="flex flex-row justify-center">
+                    <img src={noiseProcess} />
+                </div>
+                <br/>
+            </div>
+            <div className="w-full">
+                <h3 className="text-2xl font-bold">Part 1.2.1: Training</h3>
+                <p className="text-lg">
+                    Now, onto training! Below is the denoising effort of our model after the first and fifth epochs, along 
+                    with a graph highlighting the loss every few iterations during the process.
+                </p>
+                <br/>
+                <div className="flex flex-col gap-4 text-center items-center w-full">
+                    <div className="flex flex-col justify-center w-96">
+                        <img src={epoch1} />
+                        Results on some test digits after 1 epoch of training
+                    </div>
+                    <div className="flex flex-col justify-center w-96">
+                        <img src={epoch5} />
+                        Results on some test digits after 5 epochs of training
+                    </div>
+                    <div className="flex flex-col justify-center w-96">
+                        <img src={epochCurve} />
+                        Training Loss per Num Iterations
+                    </div>
+                </div>
+                <br/>
+            </div>
+            <div className="w-full">
+                <h3 className="text-2xl font-bold">Part 1.2.2: Out-of-Distribution Testing</h3>
+                <p className="text-lg">
+                    Since the denoiser was trained with a noise level of 0.5, the next step is to see how 
+                    the denoiser performs on different noise levels that it wasn't trained for, as shown below.
+                </p>
+                <div className="flex flex-row justify-center">
+                    <img src={oodTest} className="w-6/12" />
+                </div>
+                <br/>
+            </div>
+            <div className="w-full">
+                <h3 className="text-2xl font-bold">Part 1.2.3: Denoising Pure Noise</h3>
+                <p className="text-lg">
+                    We now have a denoiser primed and ready for application, the next test is to see if we can
+                    get comprehensible results from pure, random noise. The results, displayed below, seem to follow 
+                    the general pattern of most written numbers. It is rounded, it has what looks like a hole in two places,
+                    and has less emphasis in areas that are not typically covered while writing a number. It occupies the full space 
+                    where writing all numbers would overlap, with less color in the areas where there would be less writing, offering an
+                    explanation for why the typical traits are present.
+                </p>
+                <br/>
+                <div className="font-bold">
+                    <div className="flex flex-col items-center w-full">
+                        <img src={denoiseTrain} className="w-6/12" />
+                        Training loss every few iterations during the training process denoising pure noise.
+                    </div>
+                    <br/>
+                    <div className="flex flex-col items-center w-full">
+                        <img src={denoiseE1} className="w-6/12" />
+                        Sample results on pure noise after the 1st epoch.
+                    </div>
+                    <br/>
+                    <div className="flex flex-col items-center w-full">
+                        <img src={denoiseE2} className="w-6/12" />
+                        Sample results on pure noise after the 5th epoch.
+                    </div>
+                    <br/>
+                </div>
+            </div>
+            <div className="w-full">
+                <h3 className="text-2xl font-bold">Part 2.1: Adding Time Conditioning to UNet</h3>
+                <p className="text-lg">
+                    With such established, we can improve our model by integrating flow matching into our 
+                    implementation. After introducing a scalar t into the UNet model, we continue on with the 
+                    project.
+                </p>
+                <br/>
+            </div>
+            <div className="w-full">
+                <h3 className="text-2xl font-bold">Part 2.2: Training the UNet</h3>
+                <p className="text-lg">
+                    After modifying the training loop to accommodate our newest additions,
+                    we ran trained the new model, obtaining the following loss curve.
+                </p>
+                <br/>
+                <div className="flex flex-col items-center font-bold">
+                    <img src={improveTrain} />
+                    Loss over Iterations in Flow Matching Training
+                </div>
+                <br/>
+            </div>
+            <div className="w-full">
+                <h3 className="text-2xl font-bold">Part 2.3: Sampling from the UNet</h3>
+                <p className="text-lg">
+                    We can observe the improved results with pure, random noise by sampling after 1, 5, and 10 epochs.
+                </p>
+                <br/>
+                <div className="flex flex-col items-center font-bold">
+                    <img src={epoch11} />
+                    Sample results on pure noise after the 1st epoch.
+                </div>
+                <br/>
+                <div className="flex flex-col items-center font-bold">
+                    <img src={epoch55} />
+                    Sample results on pure noise after the 5th epoch.
+                </div>
+                <br/>
+                <div className="flex flex-col items-center font-bold">
+                    <img src={epoch1010} />
+                    Sample results on pure noise after the 10th epoch.
+                </div>
+                <br/>
+                <br/>
+            </div>
+            <div className="w-full">
+                <h3 className="text-2xl font-bold">Part 2.4: Adding Class-Conditioning to UNet</h3>
+                <p className="text-lg">
+                    Looking to improve the results again, I introduced class-conditioning to the model.
+                </p>
+                <br/>
+            </div>
+            <div className="w-full">
+                <h3 className="text-2xl font-bold">Part 2.5: Training the UNet</h3>
+                <p className="text-lg">
+                    With class-conditioning added, we can now observe the training loss again.
+                </p>
+                <br/>
+                <div className="flex flex-col items-center font-bold">
+                    <img src={ccTrain} />
+                    Loss over Iterations in Class-Conditioning Training
+                </div>
+                <br/>
+            </div>
+            <div className="w-full">
+                <h3 className="text-2xl font-bold">Part 2.6: Sampling from the UNet</h3>
+                <p className="text-lg">
+                    To improve simplicity I removed the learning rate scheduler. Accordingly, I compensated for the loss using a 
+                    constant learning rate of 5e-3 (the geometric mean of learning rate decaying over 10 epochs). This 
+                    essentially provided the essentially the same impact--maintaining performance--without the complexity of the scheduler. 
+                    The improved results can be viewed below.
+                </p>
+                <br/>
+                <div className="flex flex-col items-center font-bold">
+                    <img src={cc1} />
+                    Sample results on pure noise after the 1st epoch.
+                </div>
+                <br/>
+                <div className="flex flex-col items-center font-bold">
+                    <img src={cc5} />
+                    Sample results on pure noise after the 5th epoch.
+                </div>
+                <br/>
+                <div className="flex flex-col items-center font-bold">
+                    <img src={cc10} />
+                    Sample results on pure noise after the 10th epoch.
+                </div>
+                <br/>
+            </div>
+            This project has been difficult, but enlightening. I've enjoying toying with the diffusion models and gaining 
+            a better understanding of a piece of technology that has growing relevance in my life. Building the UNet has also helped 
+            my intuitive understanding of the technology, and I'm excited to apply it in future work!
         </div>
     )
 }
