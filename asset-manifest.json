@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.fa09adb4.css",
-    "main.js": "/static/js/main.4ce7b356.js",
+    "main.css": "/static/css/main.c34174b7.css",
+    "main.js": "/static/js/main.7de81f1d.js",
     "static/js/453.3d823247.chunk.js": "/static/js/453.3d823247.chunk.js",
     "static/media/linkedin.png": "/static/media/linkedin.ac22e83ea50991df6403.png",
     "static/media/cat.jpg": "/static/media/cat.be650c40938899b4ffac.jpg",
@@ -55,7 +55,11 @@
     "static/media/left_hall_mosaic.jpg": "/static/media/left_hall_mosaic.4a2851936ec769c2352d.jpg",
     "static/media/mainstacks_study_buddy.jpg": "/static/media/mainstacks_study_buddy.c1c97ce73d3cfd669e5d.jpg",
     "static/media/vcloud1.png": "/static/media/vcloud1.da3f0525f2dc8d166cf9.png",
+    "static/media/bilinear1.png": "/static/media/bilinear1.c6ac3bf919536c481974.png",
+    "static/media/nearest1.png": "/static/media/nearest1.9919796dbf8fafbae72f.png",
     "static/media/scratch_work.jpg": "/static/media/scratch_work.0cd2048bb743803c6876.jpg",
+    "static/media/nearest16.png": "/static/media/nearest16.264325b0475d986309b8.png",
+    "static/media/bilinear16.png": "/static/media/bilinear16.93809f54b46dad9e6cb1.png",
     "static/media/fox.jpg": "/static/media/fox.29d6c3f603e35948cc64.jpg",
     "static/media/blended_stack_non_linear1.jpg": "/static/media/blended_stack_non_linear1.03757d212c55789f2d08.jpg",
     "static/media/stadium.jpg": "/static/media/stadium.3b263ba9308bfaf335c4.jpg",
@@ -107,9 +111,14 @@
     "static/media/rendered_train_iter_006000.png": "/static/media/rendered_train_iter_006000.3dab3ee0b48f60ae7a18.png",
     "static/media/rendered_train_iter_002000.png": "/static/media/rendered_train_iter_002000.3469f4e2760f92acbb80.png",
     "static/media/epoch55.png": "/static/media/epoch55.1989b083947d6e50530e.png",
+    "static/media/Task4.png": "/static/media/Task4.55f4395436a6a411906b.png",
     "static/media/rendered_train_iter_001000.png": "/static/media/rendered_train_iter_001000.a4c5658b941744fa92e9.png",
     "static/media/cameraman_magnitude_binarized.jpg": "/static/media/cameraman_magnitude_binarized.96d0c6e515850ffd37d4.jpg",
+    "static/media/zero_nearest.png": "/static/media/zero_nearest.8979ca933df05a71af79.png",
+    "static/media/zero_linear.png": "/static/media/zero_linear.8ce4be308ed5e7781c71.png",
     "static/media/primary_stack_non_linear0.jpg": "/static/media/primary_stack_non_linear0.bf20cf6b0feae449d057.jpg",
+    "static/media/nearest_nearest.png": "/static/media/nearest_nearest.124ca4018c48918501cf.png",
+    "static/media/nearest_linear.png": "/static/media/nearest_linear.548739870fc767c5af44.png",
     "static/media/new_mask_2.jpg": "/static/media/new_mask_2.97a335edf4e2fb974c79.jpg",
     "static/media/primary_stack_non_linear2.jpg": "/static/media/primary_stack_non_linear2.af53a026550b3636080c.jpg",
     "static/media/primary_stack_non_linear1.jpg": "/static/media/primary_stack_non_linear1.ed55284994506fb6a9ea.jpg",
@@ -183,10 +192,13 @@
     "static/media/convolved_cameraman_dx.jpg": "/static/media/convolved_cameraman_dx.0283ab6b4e864873049f.jpg",
     "static/media/ball.png": "/static/media/ball.9cdddf6f5721ec35997f.png",
     "static/media/convolved_cameraman_dy.jpg": "/static/media/convolved_cameraman_dy.42b27eed674d89e0e37d.jpg",
+    "static/media/Task42.png": "/static/media/Task42.34c4111175fb8964c0f7.png",
+    "static/media/Task41.png": "/static/media/Task41.5b4fbaa8927e470c9755.png",
     "static/media/smooth_cameraman_dx.jpg": "/static/media/smooth_cameraman_dx.f8ca9287ea3181cf00e8.jpg",
     "static/media/high_filter_skyline.jpg": "/static/media/high_filter_skyline.ef291147e5c903034a77.jpg",
     "static/media/smooth_cameraman_dy.jpg": "/static/media/smooth_cameraman_dy.a5f9b665a3aa10699d0c.jpg",
     "static/media/hybrid_1_filtered.jpg": "/static/media/hybrid_1_filtered.69d77abdb76acd4ea56b.jpg",
+    "static/media/Task43.png": "/static/media/Task43.c62a53ca2e27dcba57c3.png",
     "static/media/high_filter_taj.jpg": "/static/media/high_filter_taj.c159f372739305383438.jpg",
     "static/media/dx_filter_2.jpg": "/static/media/dx_filter_2.cf4eec6abbb3640ad290.jpg",
     "static/media/primary_stack_laplacian_0.jpg": "/static/media/primary_stack_laplacian_0.be4fce018a0ea6eb5475.jpg",
@@ -218,12 +230,12 @@
     "static/media/blended_stack_3.jpg": "/static/media/blended_stack_3.653d40adbeccae54d375.jpg",
     "static/media/secondary_stack_laplacian_3.jpg": "/static/media/secondary_stack_laplacian_3.1a916007cfeac90bdefb.jpg",
     "index.html": "/index.html",
-    "main.fa09adb4.css.map": "/static/css/main.fa09adb4.css.map",
-    "main.4ce7b356.js.map": "/static/js/main.4ce7b356.js.map",
+    "main.c34174b7.css.map": "/static/css/main.c34174b7.css.map",
+    "main.7de81f1d.js.map": "/static/js/main.7de81f1d.js.map",
     "453.3d823247.chunk.js.map": "/static/js/453.3d823247.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.fa09adb4.css",
-    "static/js/main.4ce7b356.js"
+    "static/css/main.c34174b7.css",
+    "static/js/main.7de81f1d.js"
   ]
 }
