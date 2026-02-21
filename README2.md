@@ -1,1 +1,2 @@
-The necessary images and code are all provided. You only need to run main.ipynb with the proper files. There are some issues with runtime that can be solved by running the file in Google Colab. Otherwise, it will take some time to run. 
+The necessary code is all provided. In order to get the images needed to replicate my results for Part A, please navigate to https://nickangelici.com/#/cs180proj5 and download the associated images, renaming them
+to the names in main.ipynb.
