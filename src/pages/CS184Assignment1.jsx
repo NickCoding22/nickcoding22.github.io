@@ -45,6 +45,8 @@ export default function CS184Assignment1() {
                     CS184/284A Spring 2025 Assignment 1 Write-Up
                 </h1>
                 <div className="text-center mb-8 text-gray-600">Nicholas Angelici</div>
+                <div className="text-center mb-8 text-gray-600">nickangelici.com/#/cs184assignment1</div>
+                <div className="text-center mb-8 text-gray-600">https://github.com/berkeley-cs164-2025/hw1-NickCoding22</div>
 
                 <h2 className="text-2xl font-semibold mt-8 mb-4">Overview:</h2>
                 <p className="mb-6">
