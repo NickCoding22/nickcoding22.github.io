@@ -11,6 +11,7 @@ import CS180Proj5 from './pages/CS180Proj5.jsx';
 import CS184 from './pages/CS184.jsx';
 import CS184Assignment1 from './pages/CS184Assignment1.jsx';
 import CS184Assignment2 from './pages/CS184Assignment2.jsx';
+import CS184Assignment3 from './pages/CS184Assignment3.jsx';
 
 library.add(fas);
 
@@ -27,6 +28,7 @@ function App() {
         <Route path="/cs184" element={<CS184 />} />
         <Route path="/cs184assignment1" element={<CS184Assignment1 />} />
         <Route path="/cs184assignment2" element={<CS184Assignment2 />} />
+        <Route path="/cs184assignment3" element={<CS184Assignment3 />} />
       </Routes>
     </div>
   );
