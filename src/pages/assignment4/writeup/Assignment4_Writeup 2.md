@@ -1,0 +1,391 @@
+# CS 184/284A Spring 2026 — Homework 4 Write-Up
+
+**Names:** Nick Angelici
+
+**Partner:** None
+
+**Link to webpage:** [nickangelici.com/#/cs184assignment4](https://nickangelici.com/#/cs184assignment4)  
+**Link to GitHub repository:** [github.com/cal-cs184-student/hw4-clothsim-NickCoding22](https://github.com/cal-cs184-student/hw4-clothsim-NickCoding22)
+
+---
+
+## Overview
+
+In this assignment I am building a mass–spring cloth simulator in stages. The cloth is discretized into a regular grid of point masses connected by springs that enforce structural, shearing, and bending resistance. In Part 1, I implemented `Cloth::buildGrid` so that each scene’s parameters produce a consistent grid of masses in row-major order and the correct spring connectivity, including horizontal versus vertical placement and pinned vertices from the scene file. In Part 2, I implemented `Cloth::simulate`: accumulating external and spring forces, integrating motion with damped Verlet, and applying Provot-style limits on per-step spring extension. In Part 3, I added collision handling for spheres and planes. In Part 4, I added spatial hashing and self-collision repulsion so the sheet does not pass through itself when it folds.
+
+Part 5 adds GPU **shaders** for real-time shading (diffuse, Blinn–Phong, texturing, bump and displacement mapping, and environment-mapped reflections). For **extra credit**, I added spatially varying **wind** with controls in a separate **Wind** window. Figures live under `./images/` relative to this page.
+
+The hardest recurring theme is **ordering**: Verlet, self-collision, primitive collision, and Provot each move positions, so tunneling can appear when a later step undoes an earlier fix (for example, the floor after Provot).
+
+### Problems encountered
+
+- **Floor tunneling after Provot:** Masses could end up slightly below the plane when spring limits moved them post-collision. I resolved it by running the primitive collision pass **again** after Provot (Part 3) and by projecting penetrations when signed distance is negative without a segment–plane crossing.
+- **Self-collision vs. stability:** Aggressive repulsion without scaling caused jitter; scaling the averaged self-collision correction by `simulation_steps` kept folds stable while still preventing interpenetration.
+- **Shaders / mesh detail:** Bump looks fine at any mesh resolution; displacement on the sphere needed the **`-o` / `-a`** mesh flags to look acceptable at the silhouette (Part 5).
+
+**What I learned:** The pipeline runs discrete **ODEs** on the CPU (springs, collisions, hashing) and **parallel shading** on the GPU. Contact and self-contact are very sensitive to **integration order**; shading depends more on **interpolation** and mesh or texture resolution once data reaches the GPU.
+
+---
+
+## Part 1: Masses and springs
+
+### Grid construction
+
+I implemented `Cloth::buildGrid()` in `cloth.cpp`. The function first clears `point_masses` and `springs`, then fills `point_masses` in **row-major order with `x` varying fastest**: for each `y` from `0` to `num_height_points - 1` and each `x` from `0` to `num_width_points - 1`, the linear index is `y * num_width_points + x`, matching `buildClothMesh`, which indexes the grid the same way.
+
+Each mass is placed at normalized coordinates along the cloth’s logical width and height. With `N_w = num_width_points` and `N_h = num_height_points`, I use
+
+\[
+u = \begin{cases}
+0 & N_w = 1 \\
+\frac{x}{N_w - 1}\,\texttt{width} & \text{otherwise}
+\end{cases}
+\qquad
+v = \begin{cases}
+0 & N_h = 1 \\
+\frac{y}{N_h - 1}\,\texttt{height} & \text{otherwise}
+\end{cases}
+\]
+
+so the first mass (`x = y = 0`) lies at `(0, 0)` and the last at `(width, height)` in the varying plane, avoiding division by zero on degenerate grids.
+
+- **`HORIZONTAL`:** The cloth lies in the `xz` plane with **constant** `y = 1`. Positions are `(u,\,1,\,v)`.
+- **`VERTICAL`:** The cloth lies in the `xy` plane with **per-vertex** `z` jitter in `[-1/1000,\,1/1000]` using `rand()`, and positions `(u,\,v,\,z_{\text{off}})`.
+
+Pinned masses are determined by the scene’s `pinned` array of `[x, y]` index pairs: if `(x, y)` appears in `pinned`, that `PointMass` is constructed with `pinned = true`.
+
+### Spring connectivity
+
+Springs are added **after** all masses are stored so that `std::vector` does not reallocate and invalidate `PointMass*` endpoints. For each grid cell `(x, y)` with pointer `pm = &point_masses[idx(x, y)]`:
+
+- **Structural:** spring to `(x-1, y)` if `x > 0`, and to `(x, y-1)` if `y > 0` (left and upper neighbors in index space).
+- **Shearing:** spring to `(x-1, y-1)` if `x > 0` and `y > 0` (upper-left diagonal), and to `(x+1, y-1)` if `x + 1 < num_width_points` and `y > 0` (upper-right diagonal).
+- **Bending:** spring to `(x-2, y)` if `x ≥ 2`, and to `(x, y-2)` if `y ≥ 2` (skip-one connections along the grid).
+
+Each spring is stored as `Spring(pm_a, pm_b, spring_type)` with `spring_type` in `{STRUCTURAL, SHEARING, BENDING}` so the GUI toggles in `ClothSimulator` filter drawing and simulation correctly.
+
+### Wireframe screenshots (`pinned2.json`)
+
+From the build directory (adjust `-f` if paths differ):
+
+`./clothsim -f ../scene/pinned2.json`
+
+I moved the camera to show the cloth wireframe clearly. Using the **structural**, **shearing**, and **bending** toggle buttons in the GUI:
+
+1. **No shearing:** structural and bending **on**, shearing **off** — the grid shows axis-aligned and skip-one links without diagonal braces.
+2. **Only shearing:** structural and bending **off**, shearing **on** — only diagonal springs appear.
+3. **All constraints:** all three **on** — full mass–spring wireframe.
+
+| No shearing | Only shearing | All constraints |
+|---|---|---|
+| ![`pinned2.json`: structural + bending on, shearing off](./images/part1_pinned2_no_shear.png) | ![`pinned2.json`: only shearing constraints](./images/part1_pinned2_shear_only.png) | ![`pinned2.json`: all constraint types](./images/part1_pinned2_all.png) |
+
+Without shearing, in-plane shear would have to show up indirectly through stretched structural edges—visually the grid looks **stiffer** along diagonals. Shearing-only exposes the **diagonal braces** that stop squares from collapsing into rhombi. With **all** constraints on, structural edges carry **tension**, shear diagonals resist **skew**, and bending skip-one links penalize **curvature** across multiple edges.
+
+---
+
+## Part 2: Simulation via numerical integration
+
+I completed `Cloth::simulate(...)` in `cloth.cpp` for each simulation substep (the GUI calls it `simulation_steps` times per frame with `delta_t = 1 / (\text{fps} \cdot \text{simulation\_steps})`).
+
+### Force accumulation
+
+At the start of each call, every point mass’s `forces` vector is reset to zero. I sum all entries in `external_accelerations` (typically gravity from the simulator) into a single acceleration \(\mathbf{a}_{\text{ext}}\), then add \(\mathbf{F}_{\text{ext}} = m\,\mathbf{a}_{\text{ext}}\) to each mass, where \(m\) is the sheet’s total mass `density * width * height` divided evenly over `num_width_points * num_height_points`.
+
+For each spring, if its constraint type is disabled in `ClothParameters`, it is skipped. Otherwise Hooke’s law gives a restoring force along the spring direction \(\hat{\mathbf{u}} = (\mathbf{p}_b - \mathbf{p}_a) / \|\mathbf{p}_b - \mathbf{p}_a\|\):
+
+\[
+\|\mathbf{F}\| = k_s \bigl(\|\mathbf{p}_b - \mathbf{p}_a\| - L_0\bigr),
+\qquad
+\mathbf{F}_{\text{on }a} = \|\mathbf{F}\|\,\hat{\mathbf{u}},
+\qquad
+\mathbf{F}_{\text{on }b} = -\mathbf{F}_{\text{on }a},
+\]
+
+where \(L_0\) is the spring’s `rest_length`. I use the scene’s `ks` for structural and shearing springs, and **`0.2 * ks`** for bending springs so bending stays comparatively soft. Degenerate zero-length springs are skipped to avoid division by zero.
+
+### Damped Verlet integration
+
+For each **unpinned** mass, acceleration is \(\mathbf{a} = \mathbf{F}_{\text{total}} / m\). With \(\mathbf{x}_t\) the current position and \(\mathbf{x}_{t-\Delta t}\) stored in `last_position`, the damped Verlet update is
+
+\[
+\mathbf{x}_{t+\Delta t}
+= \mathbf{x}_t
++ \left(1 - \frac{d}{100}\right)(\mathbf{x}_t - \mathbf{x}_{t-\Delta t})
++ \mathbf{a}\,(\Delta t)^2,
+\]
+
+where \(d\) is `cp->damping` interpreted as a percentage (scaled by \(1/100\) before subtracting from 1). After computing \(\mathbf{x}_{t+\Delta t}\), I set `last_position` to the old \(\mathbf{x}_t\). Pinned masses are left unchanged.
+
+### Provot deformation constraints
+
+Later in the same substep, after self-collision (Part 4) and scene collision objects (Part 3), I enforce an upper bound on spring length: if \(\|\mathbf{p}_b - \mathbf{p}_a\| > 1.1\,L_0\), I shorten the endpoints along the same line until the length equals \(1.1\,L_0\). If neither end is pinned, each moves halfway; if one end is pinned, the other receives the full correction; if both are pinned, no update is applied. Only springs whose constraint type is enabled are constrained, matching the force loop.
+
+### Effect of simulation parameters (`pinned2.json`)
+
+Using `./clothsim -f ../scene/pinned2.json`, I paused with **P**, changed **one** parameter at a time, and compared the same starting sheet through fall and rest. I focus on visible effects: silhouette, wrinkle scale, and how the resting pile spreads.
+
+#### Spring constant \(k_s\) (default **5000**)
+
+The spring constant sets how hard the mesh fights **stretch and shear** away from the rest lengths established in `buildGrid`. On the cloth itself, that shows up as how much **local slack** the sheet is allowed to carry while still looking like a continuous surface.
+
+With **very low** `ks` (`10`), springs are weak, so the cloth stretches more and forms many small, irregular wrinkles.
+
+With **default** `ks = 5000`, the cloth keeps its width better and settles into medium-scale folds.
+
+With **high** `ks` (`50000`), stretch is strongly resisted, so folds are fewer, larger, and sharper.
+
+During the **early fall**, low `ks` already looks softer (edges lag and wobble). Mid-fall, high `ks` keeps the sheet more **plate-like** before impact. **After ground contact**, low `ks` spreads into a **broad, rumpled** blanket; high `ks` ends in a **neater pile** with fewer tiny folds, because the mesh cannot cheaply store fine-scale compression in spring extension.
+
+| `ks = 10` | `ks = 5000` (default) | `ks = 50000` |
+|---|---|---|
+| ![`pinned2.json`, low `ks` = 10](./images/part2_ks_10.png) | ![`pinned2.json`, default `ks` = 5000](./images/part2_ks_default.png) | ![`pinned2.json`, high `ks` = 50000](./images/part2_ks_50000.png) |
+
+#### Density (default **150** in `pinned2.json`)
+
+Density scales the **mass per vertex** while the spring network stays the same, so it changes how hard gravity pulls **relative to** the internal springs. On the cloth, that changes **inertia**: how fast vertices accelerate, how hard they hit the floor, and how much the pile **compresses under its own weight**.
+
+**Low density** (`1` below) makes each vertex **light**. The sheet **responds quickly** to gravity and springs; the fall can look almost **floaty** early on, with **shallower** folds because there is less weight driving deep self-contact on the ground. At rest the cloth often **spreads wider** and looks **thinner** in profile—there is simply less mass forcing the interior layers to squeeze together.
+
+**Default density** (`150`) is the middle ground used in the other scenes below.
+
+**High density** (`200` below) increases weight **without** stiffening springs, so the cloth **sags more aggressively** and hits the ground with **more momentum**. You tend to see **deeper creases** and a **thicker, more crumpled** resting heap because lower layers are loaded harder by the layers above. The outer silhouette can look **more compact** even though the spring constants did not change: it is purely the **gravitational load** relative to the same elastic network.
+
+The clearest contrast is in the **late folding and resting heap**: low density preserves a **flatter, wider** footprint; high density drives a **taller, tighter** crumple because the same springs must support more weight per vertex.
+
+| `density = 1` | `density = 150` (default) | `density = 200` |
+|---|---|---|
+| ![`pinned2.json`, density = 1](./images/part2_density_1.png) | ![`pinned2.json`, default density = 150](./images/part2_density_default.png) | ![`pinned2.json`, density = 200](./images/part2_density_200.png) |
+
+#### Damping (default **0.2**)
+
+Damping enters the Verlet update as a multiplier on the **implicit velocity** \((\mathbf{x}_t - \mathbf{x}_{t-\Delta t})\). Physically it acts like **air resistance or internal viscous losses**: it drains kinetic energy from the mesh without changing the equilibrium the springs “want” in the absence of motion.
+
+On the cloth, **low damping** means edges and interior vertices **keep moving longer** after a disturbance—ripples and post-impact bounces **linger**. You see more **oscillation** in the hanging corners and more **sloshing** in the contact pile before things visually quiet down. **High damping** kills those modes quickly: the same shape events happen, but the trajectory looks **heavier and more overdamped**, as if the fabric were oiled. Importantly, damping mostly changes **how you get to rest**, not the **final static balance** dominated by gravity and springs; that is why the two long-run “at rest” images below still look broadly similar in overall spread, while the **in-motion** trio differs strongly in **how much motion is left** at a given time.
+
+For the **three in-motion** images below (`0.2`, `0.6`, `1.0`), I used **`R`** to restart from the same initial pose each time, changed only damping, then captured all three at the **same simulation timestep** so the comparisons are apples-to-apples (same phase of the fall, different dissipation only). The two **resting** shots are separate long-run captures comparing default vs. `1.0`.
+
+At the same capture time, **0.2** is lively, **0.6** is calmer, and **1.0** is close to overdamped.
+
+| In motion: `damping = 0.2` | In motion: `damping = 0.6` | In motion: `damping = 1.0` |
+|---|---|---|
+| ![`pinned2.json`, damping = 0.2 (default, in motion)](./images/part2_damp_default.png) | ![`pinned2.json`, damping = 0.6](./images/part2_damp_0.6.png) | ![`pinned2.json`, damping = 1.0](./images/part2_damp_1.0.png) |
+
+| Rest: default damping | Rest: `damping = 1.0` |
+|---|---|
+| ![Default damping at rest](./images/part2_damp_default_rest.png) | ![Damping = 1.0 at rest](./images/part2_damp_1.0_rest.png) |
+
+### Shaded cloth at rest (`pinned4.json`)
+
+I loaded `scene/pinned4.json`, selected **Phong**, and ran until the cloth reached a **stable** resting configuration (no visible drift in the corners). Parameters match the scene defaults: `ks = 5000`, `density = 150`, `damping = 0.2`, all spring types enabled, `50×50` grid on a `1×1` sheet. The cloth forms a **shallow catenary-like sag** between the pinned corners with smooth shading across the interior; the pinned points stay fixed while the interior carries the weight.
+
+![`pinned4.json`, shaded cloth in final resting state](./images/part2_final_resting.png)
+
+---
+
+## Part 3: Handling collisions with other objects
+
+### Where collisions run in the timestep
+
+In `Cloth::simulate` (`cloth.cpp`), after damped Verlet and **self-collision** (Part 4), I iterate over every **unpinned** point mass and call `CollisionObject::collide(pm)` for each scene object **before** Provot. I then run the **same** collision loop **again after** Provot. On the cloth this matters because Provot’s stretch limiter can **re-expand** springs in a way that shoves vertices **back through** a floor or sphere even if collision had already fixed them for that substep. Without the second pass you see intermittent **ground clipping** or **sphere penetration**—especially with softer `ks` or large `delta_t`.
+
+### Sphere (`collision/sphere.cpp`)
+
+If the mass’s **current** position lies **strictly inside** the sphere (\(\|\mathbf{p}-\mathbf{o}\| < r\)), I treat the particle as having penetrated the collision volume. The **surface target** is the point on the sphere along the radial direction through \(\mathbf{p}\): \(\mathbf{t} = \mathbf{o} + r\,(\mathbf{p}-\mathbf{o})/\|\mathbf{p}-\mathbf{o}\|\). Rather than snapping \(\mathbf{p}\) blindly, I build the correction that would have taken `last_position` to \(\mathbf{t}\), \(\mathbf{c} = \mathbf{t} - \mathbf{p}_{\text{last}}\), and apply \(\mathbf{p}_{\text{new}} = \mathbf{p}_{\text{last}} + (1-f)\,\mathbf{c}\) with friction \(f\). On the simulated cloth this produces **partial sticking / sliding**: the normal part of \(\mathbf{c}\) still resolves penetration, but the tangential part is **attenuated**, so sheets can **skid** around the obstacle instead of freezing in place. Collision uses the full geometric `radius`; rendering draws a slightly smaller sphere mesh so GL triangles do not **z-fight** the cloth.
+
+### Plane (`collision/plane.cpp`)
+
+For an infinite plane through \(\mathbf{q}\) with unit normal \(\hat{\mathbf{n}}\), I track signed distances \(s_{\text{last}} = (\mathbf{p}_{\text{last}}-\mathbf{q})\cdot\hat{\mathbf{n}}\) and \(s_{\text{curr}} = (\mathbf{p}-\mathbf{q})\cdot\hat{\mathbf{n}}\). If the signs differ, the Verlet segment **crossed** the plane this substep; I intersect \(\mathbf{p}_{\text{last}}\to\mathbf{p}\) with the plane, add a small `SURFACE_OFFSET` along \(\pm\hat{\mathbf{n}}\) so the resolved point sits **just** on the correct side (the side the mass came from), then blend from `last_position` with the same friction scaling as the sphere. If \(s_{\text{curr}} < 0\) **without** a sign flip—common after large steps, soft springs, or the post-Provot pass—I **project** the mass back along \(\hat{\mathbf{n}}\) with clearance so vertices cannot **tunnel** through the floor. On the cloth the visible effect is a **clean contact line**: the sheet **pools** on the plane instead of interleaving with it, and the contact band stays **stable** over time.
+
+### `sphere.json`: resting drape vs. \(k_s\)
+
+Below: **shaded** stills at **`ks = 500`**, **`ks = 5000` (default)**, and **`ks = 50000`**. Increasing `ks` makes the **entire** spring network resist stretch more strongly, so the drape on the ball reflects **global stiffness**, not only the contact patch.
+
+At **`ks = 500`**, the cloth is soft and conformal, with many small folds.
+
+At **`ks = 5000`**, folds are broader and the silhouette is cleaner.
+
+At **`ks = 50000`**, the drape is tight, with fewer folds and sharper creases.
+
+| `ks = 500` | `ks = 5000` (default) | `ks = 50000` |
+|---|---|---|
+| ![`sphere.json`, shaded rest, `ks` = 500](./images/part3_ks_500.png) | ![`sphere.json`, shaded rest, `ks` = 5000 (default)](./images/part3_ks_5000.png) | ![`sphere.json`, shaded rest, `ks` = 50000](./images/part3_ks_50000.png) |
+
+### `plane.json`: cloth at rest on the plane
+
+Required shaded screenshot (placeholder):
+
+![`plane.json`, Phong shading at rest](./images/part3_peaceful_cloth_phong.png)
+
+---
+
+## Part 4: Handling self-collisions
+
+### Why self-collision matters for what you see
+
+Without self-collision handling, a vertical sheet that folds onto the floor will **interpenetrate**: front and back layers pass through each other because nothing in the spring model forbids two vertices from occupying the same region of space. On screen that reads as **z-fighting**, disappearing folds, and physically impossible “ghost” cloth. The implementation below keeps layers apart while still allowing a believable fold.
+
+### Implementation (spatial hashing + local repulsion)
+
+I implemented spatial hashing in `cloth.cpp`: `build_spatial_map()` buckets masses by world position into grid cells with sizes \(w = 3\cdot\texttt{width}/N_w\), \(h = 3\cdot\texttt{height}/N_h\), and \(t=\max(w,h)\).
+
+For each **unpinned** mass, `self_collide` checks its cell and 26 neighbors. Candidates within **\(2\cdot\texttt{thickness}\)** add a repulsion term along \(\mathbf{p}-\mathbf{p}'\). Corrections are averaged and scaled by `simulation_steps` for stability; self-pairs are skipped.
+
+**What that feels like on the cloth:** early in the fall, repulsion is almost invisible because layers are far apart. As soon as two regions approach within roughly **twice the thickness parameter**, you see the sheet **“bounce off itself”** instead of slicing through: folds **stack** with visible air gaps of order thickness rather than merging into one surface.
+
+Using `./clothsim -f ../scene/selfCollision.json`, the vertical sheet folds on the floor **without clipping through itself**. The pile can still **slowly spread** over long runs because this model is **repulsion without fabric friction** between layers: it fixes interpenetration, but it does not dissipate tangential slip the way real yarns do.
+
+### Fold sequence (early self-contact to near rest)
+
+Five frames from early self-contact toward a calmer pile (`selfCollision.json`):
+
+| Stage | Description | Figure |
+|------|-------------|--------|
+| Early fold / first self-contact | The sheet first **touches its own underside**; self-collision pushes **one layer off another** instead of z-fighting. | ![Self-collision fall 1](./images/part4_fall_1.png) |
+| Mid fall | Multiple **lobes** in the same region; repulsion keeps **separation** while gravity keeps pulling. | ![Self-collision fall 2](./images/part4_fall_2.png) |
+| Folding deeper | **Stacked** folds thicken; the silhouette reads more **volumetric** because layers sit on top of each other. | ![Self-collision fall 3](./images/part4_fall_3.png) |
+| Settling | Motion slows; the heap **spreads** slightly as stresses relax. | ![Self-collision fall 4](./images/part4_fall_4.png) |
+| Near rest on plane | A calm pile on the floor. There is still a little motion because this simple model does not include full real-world cloth friction. | ![Self-collision fall 5](./images/part4_fall_5.png) |
+
+### Density on self-collision (`density` = **1** vs **200**)
+
+**Low density (`1`):** Each vertex carries little mass, so gravity produces **gentler** accelerations. The sheet **responds quickly** to spring forces, and self-collision corrections do not need to fight enormous inertia. Visually the fall often looks **airier**: folds are **shallower**, layers **slide apart** more easily, and the resting heap can look **wider and flatter** because there is less weight crushing the interior of the pile.
+
+**High density (`200`):** The same mesh is **heavier**. Vertices **accelerate harder** into contact, so when two regions meet they carry **more momentum** into the self-collision solve. The cloth tends to form **deeper creases** and a **tighter, taller** crumple because upper layers **load** lower layers more aggressively. You often see **more micro-structure** inside the heap—not because springs changed, but because **contact forces** from stacked weight are larger.
+
+Comparing the two triples at similar stages (early / mid / late): high density reads **busier**, **thicker**, and **more compressed** in the pile core; low density reads as **cleaner** folds and a **broader** footprint.
+
+| Density | View 1 | View 2 | View 3 |
+|---|---|---|---|
+| `1` | ![`selfCollision.json`, density 1 (1)](./images/part4_d_1_1.png) | ![`selfCollision.json`, density 1 (2)](./images/part4_d_1_2.png) | ![`selfCollision.json`, density 1 (3)](./images/part4_d_1_3.png) |
+| `200` | ![`selfCollision.json`, density 200 (1)](./images/part4_d_200_1.png) | ![`selfCollision.json`, density 200 (2)](./images/part4_d_200_2.png) | ![`selfCollision.json`, density 200 (3)](./images/part4_d_200_3.png) |
+
+### Spring constant on self-collision (`ks` = **50** vs **50000**)
+
+**Low `ks` (`50`):** The mesh is **easy to stretch and shear**, so when one part of the sheet tries to slide across another, the material can **absorb** motion by **local stretch** instead of only bending. You tend to see **more irregular**, **floppier** piles with **many small wrinkles** because nothing strongly enforces a uniform metric on the surface.
+
+**High `ks` (`50000`):** The sheet is **much stiffer**, so it **resists** storing deformation in stretch; large regions try to move almost **rigidly** until they are forced to bend. During folding that often means **fewer** broad folds but **sharper** creases where bending concentrates, and the pile can look **more “springy”** because local buckling is expensive in elastic energy.
+
+**Stiffness link to Part 2 / Part 3:** The same `ks` knob is at work: higher `ks` always means **more resistance to edge-length change**, whether the cloth is hanging in open air, draping on a sphere, or **jamming against itself** in a heap.
+
+| `ks` | View 1 | View 2 | View 3 |
+|---|---|---|---|
+| `50` | ![`selfCollision.json`, ks 50 (1)](./images/part4_ks_50_1.png) | ![`selfCollision.json`, ks 50 (2)](./images/part4_ks_50_2.png) | ![`selfCollision.json`, ks 50 (3)](./images/part4_ks_50_3.png) |
+| `50000` | ![`selfCollision.json`, ks 50000 (1)](./images/part4_ks_50000_1.png) | ![`selfCollision.json`, ks 50000 (2)](./images/part4_ks_50000_2.png) | ![`selfCollision.json`, ks 50000 (3)](./images/part4_ks_50000_3.png) |
+
+---
+
+## Part 5: Shaders
+
+This section covers shader pipeline basics, diffuse and Blinn–Phong lighting, texture mapping, bump/displacement (shared height map), and mirror reflections.
+
+### What a shader program does (vertex + fragment)
+
+Modern OpenGL renders meshes by sending triangles through a **programmable pipeline** on the GPU. A **shader program** bundles at least a **vertex shader** and a **fragment shader** that replace fixed-function behavior with your own code.
+
+**Vertex shader:** runs **once per input vertex**. It reads **vertex attributes** (here: position, normal, tangent, UV) plus **uniforms** shared by the whole draw call (transform matrices, light positions, samplers). Its mandatory job is to output **`gl_Position`**, a homogeneous coordinate that the hardware uses to **project** the vertex to screen space. It can also output **varyings** (e.g. world normal, UV) that the rasterizer **linearly interpolates** across each triangle.
+
+**Rasterization:** the GPU determines which pixels (fragments) lie inside the projected triangle and interpolates the varyings to each fragment.
+
+**Fragment shader:** runs **once per fragment** (roughly per pixel, per sample). It receives the interpolated varyings and typically writes an RGBA **`out_color`**. This is where you evaluate **material BRDF approximations** (Lambert, Blinn–Phong), sample **textures**, or look up **cube maps**. Because millions of fragments can be shaded per second, you can afford fairly rich shading while the CPU cloth integrator stays the bottleneck for physics.
+
+**Connection to the cloth:** the mass–spring simulation still updates vertex positions on the CPU, but the **shader** decides how those positions and normals are **interpreted visually**—flat wireframe, matte diffuse, textured fabric, or mirror chrome—without changing the simulation itself.
+
+### Diffuse shading (`shaders/Diffuse.frag`)
+
+**Diffuse (Lambertian)** models surfaces whose reflected color is **view-independent** to first order: brightness depends on \(\mathbf{n}\cdot\hat{\boldsymbol{\ell}}\) (how directly the face points at the light), not on the camera direction. I implemented inverse-square falloff so radiance dims with distance to the light, then multiplied by a Lambert term and a diffuse albedo `u_color.rgb` (\(k_d\)).
+
+**On the cloth:** folds read as **broad shaded bands**—ridges catch light, troughs fall into shadow—but you never get the **tight sparkling streaks** of specular materials. That makes diffuse a good baseline for “fabric body color” before adding Phong highlights or textures.
+
+I implemented Lambertian diffuse with inverse-square falloff: \(L = k_d \odot (I/r^2)\,\max(0,\,\mathbf{n}\cdot\hat{\boldsymbol{\ell}})\), where \(\hat{\boldsymbol{\ell}}\) points toward the light, \(r\) is the distance to the light, and \(k_d\) is the diffuse coefficient (`u_color.rgb`).
+
+### Blinn–Phong shading (`shaders/Phong.frag`)
+
+**Blinn–Phong in words:** The model treats outgoing light as a sum of three intuitive pieces. **Ambient** approximates all indirect illumination with a **small constant** so shadowed regions are not pure black. **Diffuse** is the same Lambert term as in diffuse shading: surfaces tilted toward the light appear brighter. **Specular** adds **view-dependent** highlights by measuring how close the **half vector** \(\mathbf{h}\) (halfway between directions to the light and to the camera) is to the surface normal: when \(\mathbf{h}\approx \mathbf{n}\), you get a **glossy flash** whose width is controlled by exponent \(p\). Compared to the older Phong highlight that used `dot(reflect, view)`, Blinn–Phong’s \(\max(0, \mathbf{n}\cdot\mathbf{h})^p\) tends to be **more stable** when lights or views move.
+
+Mathematically I accumulate **ambient** plus **diffuse** plus **specular**: \(k_s \odot (I/r^2)\,\max(0,\,\mathbf{n}\cdot\mathbf{h})^p\), with \(\mathbf{h} = \mathrm{normalize}(\hat{\boldsymbol{\ell}}+\hat{\mathbf{v}})\). I use small ambient `0.08 * k_d`, `k_s = 0.35`, and \(p = 48\) (tunable).
+
+For the Blinn–Phong breakdown I temporarily changed the final line in `Phong.frag` so `out_color` showed only **ambient**, only **diffuse**, only **specular**, then the **full** sum, restarting `clothsim` after each edit.
+
+**Same pose, term by term:**
+
+1. **Ambient only** — the cloth reads almost **flat**: folds are barely separated because there is **no directional light**. This image isolates the “always-on” energy floor.
+2. **Diffuse only** — large-scale **light/dark** structure returns: you can read **fold depth** from shading, but creases still lack **sparkle** because specular is zeroed out.
+3. **Specular only** — you see **only** thin bright lines where micro-geometry faces the half direction; the surface looks like a **dark sheet with neon edges**, proving specular is **view-sensitive** in a way diffuse is not.
+4. **Full Blinn–Phong** — **sum** of the three: the cloth keeps the **diffuse body** from the diffuse-only render and gains **edge glints** from the specular-only render, matching what we usually mean by “shaded cloth” in Parts 2–4.
+
+| Ambient | Diffuse | Specular | Full Blinn-Phong |
+|---|---|---|---|
+| ![Phong: ambient term only](./images/part5_ambient_only.png) | ![Phong: diffuse term only](./images/part5_diffuse_only.png) | ![Phong: specular term only](./images/part5_specular_only.png) | ![Phong: full Blinn–Phong](./images/part5_phong_all.png) |
+
+### Texture mapping (`shaders/Texture.frag`)
+
+I added a custom image under `textures/` and pointed the cloth at it. The fragment shader samples `u_texture_1` at interpolated `v_uv` and outputs `texture(u_texture_1, v_uv)` with **opaque alpha**, so the albedo is whatever RGB the image stores at that UV.
+
+Diffuse and Phong multiply lighting against a **single** material color; the texture shader multiplies against a **spatially varying** albedo, so two points on the same fold can differ if their UVs hit different texels. On the cloth that reads as **printed or woven detail** on the same simulated geometry—the **pattern** distorts with the folds.
+
+![Texture shader with a custom albedo](./images/part5_custom_texture.png)
+
+### Bump and displacement mapping
+
+**Bump (`shaders/Bump.frag` + `Bump.vert`):** Height \(h\) is the **R** channel of `u_texture_2`. One-texel offsets use `u_texture_2_size`. Finite differences give
+
+\[
+dU = \bigl(h(u+1/w,\,v) - h(u,v)\bigr)\,k_h\,k_n,\quad
+dV = \bigl(h(u,\,v+1/h_{\mathrm{pix}}) - h(u,v)\bigr)\,k_h\,k_n,
+\]
+
+with \(k_h=\) `u_height_scaling`, \(k_n=\) `u_normal_scaling`. The perturbed tangent-space normal is \(\mathbf{n}_o \propto (-dU,\,-dV,\,1)\). With world \(\mathbf{T},\mathbf{B},\mathbf{N}\) from the vertex shader (\(\mathbf{B}=\mathbf{N}\times\mathbf{T}\) after Gram–Schmidt on \(\mathbf{T}\)), \(\mathbf{n}_{\mathrm{world}} = \mathrm{normalize}([\mathbf{T}\ \mathbf{B}\ \mathbf{N}]\,\mathbf{n}_o)\). Lighting matches Blinn–Phong above but uses \(\mathbf{n}_{\mathrm{world}}\).
+
+**Displacement (`shaders/Displacement.vert` + `Displacement.frag`):** The vertex shader moves each vertex in **model space** along the original normal by `texture(u_texture_2, in_uv).r * u_height_scaling`. The fragment shader matches **Bump** so lighting stays consistent with the perturbed normals.
+
+For these renders the height slot (`u_texture_2`) uses **`textures/texture_3.png`** instead of the default **`texture_2.png`**, so bump and displacement share the same brick-like height field.
+
+**Bump vs displacement:** **Bump** keeps triangle positions on the smooth cloth or sphere while normals **wiggle** as if bricks existed—**mortar shading** reads well on both materials below, but the **silhouette** (cloth hem, sphere rim) stays as smooth as the base mesh because no vertex moved. **Displacement** **relocates** vertices before rasterization, so the sphere’s outline becomes **blocky** at the brick scale and **self-shadowing** between bricks is stronger because triangles can **occlude** neighbors. **Displacement** therefore depends strongly on how many vertices sample the height field; **bump** changes little with tessellation because detail lives in **fragment** space.
+
+| Bump (cloth) | Bump (sphere) | Displacement (sphere) |
+|---|---|---|
+| ![Bump mapping on cloth (`sphere.json`)](./images/part5_bump_mapping_cloth.png) | ![Bump mapping on sphere](./images/part5_bump_mapping_sphere.png) | ![Displacement mapping on sphere (default mesh resolution)](./images/part5_displacement_mapping_sphere.png) |
+
+**Mesh resolution (`-o` / `-a`):** I ran **`./clothsim -f ../scene/sphere.json -o 16 -a 16`** and **`-o 128 -a 128`** with the **same** displacement texture and height scale. At **16×16**, each displaced brick spans **so few triangles** that the silhouette is a **staircase** and each brick reads as a **single bent plate**. At **128×128**, the height map is sampled at **many more** vertices, so bricks **subdivide** on the surface: the equator looks **rounder**, mortar channels **continue** around the sphere, and specular highlights **break up** more realistically along micro-ledges. **Bump** on the sphere would look almost identical between these runs because normals are evaluated densely per pixel regardless of mesh coarseness.
+
+| Coarse mesh (`-o 16 -a 16`) | Fine mesh (`-o 128 -a 128`) |
+|---|---|
+| ![Displacement, coarse sphere mesh (`-o 16 -a 16`)](./images/part5_16_16.png) | ![Displacement, fine sphere mesh (`-o 128 -a 128`)](./images/part5_128_128.png) |
+
+### Environment-mapped reflections (`shaders/Mirror.frag`)
+
+The view direction toward the hit is \(\mathbf{w}_i = \mathrm{normalize}(\mathbf{p}-\mathbf{u}_{\mathrm{cam}})\). The reflected direction is `reflect(wi, n)` with world normal \(\mathbf{n}\). The fragment shader samples `u_texture_cubemap` along that direction. There are **no shadow rays** and no indirect simulation: every fragment is “what color does an **ideal mirror** see in direction \(\mathrm{reflect}(\mathbf{w}_i,\mathbf{n})\)?”
+
+**Cloth vs sphere:** The **cloth** has **high-frequency normal variation** from folds, so the cubemap **chops into tiny streaks**—**crumpled chrome foil**, each micro-face picking a different sky direction. The **sphere** has a **smooth** normal field (when not heavily displaced), so reflections stay **coherent**: a **distorted panorama** that moves continuously as the camera orbits. Both use the **same** mirror shader; the difference is **geometry and normals** from the simulation versus the analytic sphere.
+
+| Mirror: cloth | Mirror: sphere |
+|---|---|
+| ![Mirror shader on cloth](./images/part5_mirror_cloth.png) | ![Mirror shader on sphere](./images/part5_mirror_sphere.png) |
+
+### Custom shader
+
+I did **not** add a separate custom fragment shader beyond the assigned programs.
+
+---
+
+## Extra credit: Wind
+
+### What changed in the codebase
+
+- **`ClothParameters` (`cloth.h`)** — `wind_strength`, `wind_frequency`, `wind_direction`; these optional keys are parsed in `main.cpp`.
+- **`Cloth::simulate` (`cloth.cpp`)** — After uniform external accelerations, each mass adds wind force \(m\mathbf{a}_{\text{wind}}\) where \(\mathbf{a}_{\text{wind}} = \hat{\mathbf{d}}\,\texttt{wind\_strength}\cdot s\) with \(\hat{\mathbf{d}}\) the normalized `wind_direction` (default axis if zero) and \(s = \tfrac12 + \tfrac12\sin\bigl(\texttt{wind\_frequency}\,(x + 0.37y + z)\bigr)\) evaluated at the mass’s current position.
+- **`ClothSimulator` (`clothSimulator.cpp`)** — Wind controls live in a **separate Wind panel** (lower-left) so the main **Simulation** panel stays readable.
+- **Demo scene** — `scene/extra_credit.json` with wind enabled for easy on/off visual comparison.
+
+### Running the demo
+
+1. Run **`./clothsim -f ../scene/extra_credit.json`**.
+2. **Wind:** open the **Wind** panel; set **strength** to `0` versus a higher value (the demo scene uses `6`), same camera, reset with **R** between trials for a matched comparison.
+
+### Extra-credit figures
+
+| Wind off | Wind on |
+|---|---|
+| ![Wind off](./images/ec_wind_off.png) | ![Wind on](./images/ec_wind_on.png) |
+
